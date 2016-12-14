@@ -1,0 +1,164 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script type="text/javascript">
+$(function(){
+  //开启弹窗
+  $("#btn_addaccount").click(function(){
+      $("#add_account_div").modal("toggle");
+  });
+  $("#close_btn_add_account").click(function(){
+    $("#add_account_acc").val("");
+    $("#add_account_pass").val("");
+    $("#add_account_firm").val("");
+  });
+  $("#submit_btn_add_account").click(function(){
+    var acc = $("#add_account_acc").val();
+    var pass = $("#add_account_pass").val();
+    var comfirm = $("#add_account_firm").val();
+    var permession = $("#add_permession").val();
+    if (pass != comfirm) {
+      alert("两次输入密码不一致");
+      return;
+    }
+    $.post("/gm/accman",{
+      "optype":"1",
+      "account":acc,
+      "password":pass,
+      "permession":permession
+    },function(data){
+      alert(data);
+     // $("#add_account_div").modal("dismiss");
+      window.location.reload();
+    },"text");
+  });
+  $("#sendnew").click(function(){
+      var pwd = $("#pwd").val()
+      var account = $("#account").val()
+      $.post("/gm/accman",{
+          "optype":"3",
+          "account":account,
+          "password":pwd
+      },function(data){
+          alert(data);
+          $('#changepwd').modal('hide');
+          window.location.reload();
+      },"text");
+    });
+  $(".delAccount").click(function(){
+    var account = $(".delAccount").parent().prev().prev().text();
+    alert(account);
+  });
+});
+function delAccount(account){
+  $.post("/gm/accman",{
+      "optype":"2",
+      "account":account
+    },function(data){
+      alert(data);
+      window.location.reload();
+    },"text");
+}
+function changePwd(account){
+  $("#account").val(account);
+  $("#pwd").val("");
+  $('#sendnew').modal('show');
+}
+</script>
+<div class="graphs">
+  <div class="row">
+  <div class="col-md-12">
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3>帐号信息</h3>
+    </div>
+    <div class="panel-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="col-md-5">帐号</th>
+            <th class="col-md-5">权限</th>
+            <th class="col-md-2">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for acc in accs %}
+          <tr>
+            <td>{{acc["account"]}}</td>
+            <td>{{acc["permession"]}}</td>
+            <td>
+            <button class=" col-md-5 btn btn-info" data-toggle="modal" data-target='#changepwd' onclick="changePwd('{{acc['account']}}')" >重置密码</button>
+            <button class="col-md-offset-2 col-md-5 btn btn-info" onclick="delAccount('{{acc['account']}}')" >删除帐号</button></td>
+          </tr>  
+          {% end for %}       
+        </tbody>
+      </table>
+      <div class="col-md-12">
+        <button id="btn_addaccount" class="col-md-12 btn btn-info">添加帐号</button>
+      </div>
+      
+    </div>
+  </div>
+  </div>
+  </div>
+  <div class="row">
+    
+  </div>
+<div class="clearfix"> </div>
+</div>
+<div class="modal" id="add_account_div">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+        <h4 class="modal-title">添加新管理员</h4>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <input class="col-md-12" type="text" id="add_account_acc" placeholder="请输入帐号" />
+        </div>
+        <div class="input-group">
+          <input class="col-md-12" type="password" id="add_account_pass"placeholder="请输入密码"/>
+        </div>
+        <div class="input-group">
+          <input class="col-md-12" type="password" id="add_account_firm" placeholder="再次输入密码"/>
+        </div>
+        <div class="input-group">
+        <label>设置权限：</label>
+          <select id="add_permession">
+            {% for k in ops %}
+              <option value="{{k}}">{{ops[k]}}</option>
+            {% end for %}
+            <!--option value="1">超级管理员</option>
+            <option value="2">操作人员</option>
+            <option value="3">查看员</option>
+            <option value="4" selected="selected">什么都干不了</option-->
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="close_btn_add_account" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button id="submit_btn_add_account" class="btn btn-primary">添加</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal" id="changepwd">
+  <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">修改密码</h4>
+            </div>
+            <div class="modal-body">
+                <label>账号<input id="account" name="account" type="text" /></label>
+                <label>新密码<input id="pwd" name="pwd" type="text" /></label>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="sendnew" class="btn btn-info" >确认</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+  </div>
+</div>
+
+{% end %}

@@ -1,0 +1,71 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+$(function(){
+DataToUI(0);
+$("#mm_select_mailsstatus").change(function(){
+  var type = $("#mm_select_mailsstatus").val();
+  DataToUI(type);
+});
+});
+
+function opmail(idx, type){
+  $.post("/gm/mailmanage",{
+    "optype":"update",
+    "idx":idx,
+    "type":type
+  },function(data){
+    DataToUI(0);
+  });
+}
+function DataToUI(type)
+{
+  $.post("/gm/mailmanage",{
+    "optype":"info",
+    "type":type
+  },function(data){
+    $("#mail_check_info").find("tbody").text("");
+    $.each(data.mails, function(k, v){
+      var mtype = "个人邮件"
+      if (v[8] == 1) {
+        mtype = "全服邮件"
+      }
+      var contro = "<button class='btn btn-info' onclick='opmail("+v[0]+", 1);'>通过</button>||<button class='btn btn-danger' onclick='opmail("+v[0]+", 2);'>未通过</button>";
+      if(v[12] != 0)
+        contro = "";
+      $("#mail_check_info").find("tbody").append("<tr><td>"+v[1]+"</td><td>"+v[2]+"</td><td>类型:"+mtype+"   收件人:"+v[3]+"</br>标题:"+v[4]+"   内容:"+v[5]+"</br>奖励:"+v[6]+v[7]+"   时间:"+v[10]+"  "+v[11]+"</br></td><td>"+contro+"</td></tr>");
+    });
+  },"json");
+}
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">审核邮件(邮件状态:
+        <select id="mm_select_mailsstatus">
+          <option value="0" selected>未审核</option>
+          <option value="1">通过</option>
+          <option value="2">未通过</option>
+        </select>)
+        </div>
+        <div class="panel-body">
+          <table class="table" id="mail_check_info">
+            <thead>
+              <tr>
+              <th>服务器</th>
+              <th>发件人</th>
+              <th>邮件信息</th>
+              <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+{% end %}

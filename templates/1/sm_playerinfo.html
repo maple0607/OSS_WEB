@@ -1,0 +1,337 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+function restrict(flag)
+{
+  var timelong = $("#input_timelong").val();
+  var svrid = $("#serverid").val();
+  var name = $("#inputName").val();
+  $.post("/gm/playerinfo",{
+      "optype":"restrict",
+      "svrid":svrid,
+      "name":name,
+      "flag":flag,
+      "timelong":timelong
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      $("#extradiv").children(".panel-body").html(data.result);
+    },"json");
+}
+function setVip()
+{
+  var viplevel = $("#input_vip").val();
+  var svrid = $("#serverid").val();
+  var name = $("#inputName").val();
+  $.post("/gm/playerinfo",{
+      "optype":"setvip",
+      "svrid":svrid,
+      "name":name,
+      "viplevel":viplevel,
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      $("#extradiv").children(".panel-body").html(data.result);
+    },"json");
+}
+function RemoveGoldMoney()
+{
+  var goldmoney = $("#goldmoney").val();
+  var svrid = $("#serverid").val();
+  var name = $("#inputName").val();
+  var playerGoldMoney = $("#playerGoldMoney").val();
+  $.post("/gm/playerinfo",{
+      "optype":"removegoldmoney",
+      "svrid":svrid,
+      "name":name,
+      "goldmoney":goldmoney,
+      "playerGoldMoney":playerGoldMoney,
+  },function(data){
+      <!--$("#extradiv").children(".panel-body").html('');-->
+      <!--$("#extradiv").children(".panel-body").html(data.result);-->
+      alert(data)
+  },"");
+}
+function OffLine()
+{
+  var svrid = $("#serverid").val();
+  var name = $("#inputName").val();
+  $.post("/gm/playerinfo",{
+      "optype":"offline",
+      "svrid":svrid,
+      "name":name,
+  },function(data){
+      <!--$("#extradiv").children(".panel-body").html('');-->
+      <!--$("#extradiv").children(".panel-body").html(data.result);-->
+      alert(data)
+  },"");
+}
+$(function(){
+  $("#roleinfobtn").hide();
+  $("#backinfobtn").hide();
+  $("#petinfobtn").hide();
+  $("#friendinfobtn").hide();
+  $("#guildinfobtn").hide();
+  $("#statusbtn").hide();
+  $("#searchName").click(function(){
+    var svrid = $("#serverid").val();
+    var name = $("#inputName").val();
+    $.post("/gm/playerinfo",{
+      "optype":"searchbase",
+      "svrid":svrid,
+      "name":name
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      if(data.error == 0)
+      {
+          $("#playerAccount").val(data.account);
+          $("#playerUUID").val(data.uuid);
+          $("#playerLevel").val(data.level);
+          $("#playerVipLevel").val(data.viplevel);
+          $("#playerGoldMoney").val(data.goldmoney);
+          $("#playerGoldMOneyPur").val(data.goldmoneypur);
+          $("#playerMoney").val(data.money);
+          $("#playerVitality").val(data.vitality);
+          $("#playerGuild").val(data.guild);
+          $("#playerChannel").val(data.channel);
+          $("#playerTimeLong").val(data.timelong);
+          $("#playerCreateTime").val(data.createtime);
+          $("#playerLoginTime").val(data.logintime);
+          $("#playerLogoutTime").val(data.logouttime);
+          $("#playerFBChat").val(data.fbchat);
+          $("#playerFBLogin").val(data.fblogin);
+          $("#roleinfobtn").show();
+          $("#backinfobtn").show();
+          $("#petinfobtn").show();
+          $("#friendinfobtn").show();
+          $("#guildinfobtn").show();
+          $("#statusbtn").show();
+      }else
+      {
+        $("#playerAccount").val("");
+          $("#playerUUID").val("");
+          $("#playerLevel").val("");
+          $("#playerVipLevel").val("");
+          $("#playerGoldMoney").val("");
+          $("#playerGoldMOneyPur").val("");
+          $("#playerMoney").val("");
+          $("#playerVitality").val("");
+          $("#playerGuild").val("");
+          $("#playerChannel").val("");
+          $("#playerTimeLong").val("");
+          $("#playerCreateTime").val("");
+          $("#playerLoginTime").val("");
+          $("#playerLogoutTime").val("");
+          $("#playerFBChat").val("");
+          $("#playerFBLogin").val("");
+        $("#roleinfobtn").hide();
+        $("#backinfobtn").hide();
+        $("#petinfobtn").hide();
+        $("#friendinfobtn").hide();
+        $("#guildinfobtn").hide();
+        $("#statusbtn").hide();
+        alert("查无此人");
+      }
+
+    },"json");
+  });
+  $("#roleinfobtn").click(function(){
+    var svrid = $("#serverid").val();
+    var name = $("#inputName").val();
+    
+
+    $.post("/gm/playerinfo",{
+      "optype":"roleinfo",
+      "svrid":svrid,
+      "name":name
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      var content = "<table class='table' style=\"table-layout:fixed;\"><thead><tr><th>职位</th><th>信息</th></tr></thead><tbody>";
+      $.each(data.result,function(i,da){
+        content =content + "<tr><td >"+da.job+"</td><td style='word-wrap:break-word;'>"+da.info+"</td></tr>";
+      });
+      content += "</tbody></table>";
+      $("#extradiv").children(".panel-body").html(content);
+    },"json");
+  });
+  $("#backinfobtn").click(function(){
+    var svrid = $("#serverid").val();
+    var name = $("#inputName").val();
+    $.post("/gm/playerinfo",{
+      "optype":"baginfo",
+      "svrid":svrid,
+      "name":name
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      $("#extradiv").children(".panel-body").html(data.result);
+    },"json");
+  });  
+  $("#petinfobtn").click(function(){
+    var svrid = $("#serverid").val();
+    var name = $("#inputName").val();
+    $.post("/gm/playerinfo",{
+      "optype":"petinfo",
+      "svrid":svrid,
+      "name":name
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      $("#extradiv").children(".panel-body").html(data.result);
+    },"json");
+  });
+  $("#friendinfobtn").click(function(){
+    var svrid = $("#serverid").val();
+    var name = $("#inputName").val();
+    $.post("/gm/playerinfo",{
+      "optype":"friendinfo",
+      "svrid":svrid,
+      "name":name
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      $("#extradiv").children(".panel-body").html(data.result);
+    },"json");
+  });
+  $("#guildinfobtn").click(function(){
+    var svrid = $("#serverid").val();
+    var name = $("#inputName").val();
+    var guildName = $("#playerGuild").val();
+    $.post("/gm/playerinfo",{
+      "optype":"guildinfo",
+      "svrid":svrid,
+      "name":name,
+      "guild":guildName
+    },function(data){
+      $("#extradiv").children(".panel-body").html('');
+      $("#extradiv").children(".panel-body").html(data.result);
+    },"json");
+  });
+  $("#statusbtn").click(function(){
+    $("#extradiv").children(".panel-body").html('');
+    var content = "<div class='col-md-12'><div class='col-md-3'><div class='input-group'><input type='text' id='input_timelong' class='col-md-12' placeholder='请输入时长,格式:天/时'/></div><div class='input-group'><button id='mutebtn' class='btn btn-info col-md-6 col-offset-1' onclick='restrict(0)'>禁止聊天</button><button id='banbtn' class='btn btn-info col-md-6 col-offset-1' onclick='restrict(2)'>禁止登入</button></div><div class='input-group'><button id='dmutebtn' class='btn btn-info col-md-6 col-offset-1'  onclick='restrict(1)'>禁言解除</button><button id='dbanbtn' class='btn btn-info col-md-6 col-offset-1'  onclick='restrict(3)'>禁登解除</button></div></div><div class='col-md-3'><div class='input-group'><input type='text' id='input_vip' class='col-md-12' placeholder='请输入等级[0~15]'/></div><div class='input-group'><button id='dmutebtn' class='btn btn-info col-md-12' onclick='setVip()'>设置VIP</button></div></div><div class='col-md-3'><div class='input-group'><input type='text' id='goldmoney' class='col-md-12' placeholder='请输入要扣除的元宝数'/></div><div class='input-group'><button id='dmutebtn' class='btn btn-info col-md-12' onclick='RemoveGoldMoney()'>扣除元宝</button></div></div><div class='col-md-3'><div class='input-group'><button id='dmutebtn' class='btn btn-danger col-md-12' onclick='OffLine()'>踢出玩家</button></div></div></div>"
+    $("#extradiv").children(".panel-body").html(content);
+  });
+
+});
+
+
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">玩家基本信息（
+          <select id="serverid" class="from-control1">
+            <option value="-1">--请选择服务器--</option>
+            
+        {% for svrid in servers%}
+        
+            <option value="{{svrid}}">{{servers[svrid]}}</option>
+            
+        {% end for %}
+        
+          </select>
+          <input id="inputName" type="text"/>
+          <button id="searchName" class="btn btn-info">搜索</button>
+          ）</div>
+        <div class="panel-body">
+        <div class="row">
+          <div class="col-md-8">
+          <div class="col-md-3">
+            <div class="input-group">
+              <label for="playerAccount">帐号</label>
+              <input id="playerAccount" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerUUID">角色</label>
+              <input id="playerUUID" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerLevel">等级</label>
+              <input id="playerLevel" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerVipLevel">会员</label>
+              <input id="playerVipLevel" disabled="disabled" type="text" class="from-control1"  placeholder="暂无信息" />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="input-group">
+              <label for="playerGoldMoney">元宝</label>
+              <input id="playerGoldMoney" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerGoldMOneyPur">充值</label>
+              <input id="playerGoldMOneyPur" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerMoney">铜钱</label>
+              <input id="playerMoney" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerVitality">体力</label>
+              <input id="playerVitality" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>            
+          </div>
+          <div class="col-md-3">
+            <div class="input-group">
+              <label for="playerGuild">所属公会</label>
+              <input id="playerGuild" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerChannel">运营渠道</label>
+              <input id="playerChannel" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerTimeLong">在线时长</label>
+              <input id="playerTimeLong" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerCreateTime">创建时间</label>
+              <input id="playerCreateTime" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>            
+          </div>
+          <div class="col-md-3">
+            <div class="input-group">
+              <label for="playerLoginTime">最近登录</label>
+              <input id="playerLoginTime" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerLogoutTime">最近登出</label>
+              <input id="playerLogoutTime" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerFBChat">禁言状态</label>
+              <input id="playerFBChat" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>
+            <div class="input-group">
+              <label for="playerFBLogin">禁登状态</label>
+              <input id="playerFBLogin" disabled="disabled" type="text" class="from-control1" placeholder="暂无信息" />
+            </div>              
+          </div>
+          <div class="row">
+            <button class="btn btn-info col-md-2" id="roleinfobtn">角色信息</button>
+            <button class="btn btn-info col-md-2" id="backinfobtn">背包信息</button>
+            <button class="btn btn-info col-md-2" id="petinfobtn">宠物信息</button>
+            <button class="btn btn-info col-md-2" id="friendinfobtn">好友信息</button>
+            <button class="btn btn-info col-md-2" id="guildinfobtn">公会信息</button>
+            <button class="btn btn-info col-md-2" id="statusbtn" >状态编辑</button>              
+            </div>
+
+          </div>
+          <div class="col-md-4">
+            说明：</br>
+            1.选择服务器，输入玩家名字 点击查询，显示玩家基本信息</br>
+            2.基本信息下方有额外信息查询按钮，可点击查看玩家额外信息</br>
+            3.在状态编辑中，涉及功能（vip等级调整，元宝扣除，禁言，禁登，踢出玩家）</br>
+          </div>
+          </div>
+        </div> <!--end panel body-->
+      </div>
+      <div class="panel panel-info" id="extradiv">
+        <div class="panel-heading">玩家额外信息</div>
+        <div class="panel-body" >
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+{% end block %}

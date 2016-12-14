@@ -1,0 +1,293 @@
+{% extends "base2.html" %}
+{% block content %} 
+<style>
+  .ui-autocomplete {
+    max-height: 160px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  * html .ui-autocomplete {
+    height: 160px;
+  }
+</style>
+<script language="javascript">
+$(function(){
+  $.post("/gm/gamemail",{
+    "request":"items"
+    },function(data){
+      availableTags = data["result"];
+      $( "#item_select_input" ).autocomplete({source: availableTags});
+    }, "json");
+  $("#dtBox").DateTimePicker();
+  $("#res_add").click(function(){
+    var num = $("#res_num").val();
+    var id = $("#res_select").val();
+    var name = $("#res_select").find("option:selected").text();
+    if (num == "" || id == 0) {
+      alert("资源数据不能为空或者资源类型错误");
+      return;
+    }
+    $("#res_content").append("<a href=\"#\" onclick=\"javascript:this.parentNode.removeChild(this);\" class=\"btn btn-info\">"+name+":"+id+","+num+";</a> ");
+  });
+  $("#item_add").click(function(){
+    var num = $("#item_num").val();
+    var compName = $("#item_select_input").val();
+    nameAndId = compName.split('|');
+    var name = nameAndId[0];
+    var id = nameAndId[1];
+    var type = id.substring(0,1);
+    if (num == "" || name == "" || id == null) {
+      alert("资源数据不能为空或者资源类型错误");
+      return;
+    }
+
+    $("#item_content").append("<a href=\"#\" onclick=\"javascript:this.parentNode.removeChild(this);\" class=\"btn btn-info\">"+name+":"+type+","+id+","+num+";</a> ");
+  });
+
+$("#mailreset").click(function(){
+  window.location.reload();
+});
+
+$("#submit_mail").click(function(){
+var svrid = $("#mail_serverid").val();
+var names = $("#mail_playernames").val();
+var title = $("#mail_title").val();
+var content = $("#mail_content").val();
+var itemcnt = $("#item_content").text();
+var totime = $("#mail_totime").val();
+var timelong = $("#timelong").val();
+var flag = $("#select_mail_type").val();
+var itess = itemcnt.split(' ');
+var items = "";
+for (var i = 0; i < itess.length - 1; i++) {
+ items += itess[i].split(":")[1];
+}
+var rescnt = $("#res_content").text();
+var ress = rescnt.split(' ');
+var res = "";
+for (var i = 0; i < ress.length - 1; i++) {
+ res += ress[i].split(":")[1];
+}
+$.post("/gm/gamemail",{
+"svrid":svrid,
+"names":names,
+"title":title,
+"body":content,
+"item":items,
+"res":res,
+"totime":totime,
+"vlid":timelong,
+"flag":flag
+},function(data){
+  if (data == 1) {
+
+  alert("邮件提交成功请及时联系审核");
+  
+  }else if (data ==2) {
+    alert("亲爱的,你欺骗我的感情,你不选服务器我不知道发给谁");
+  }
+window.location.reload();
+});
+});
+
+$("#select_mail_type").change(function(){
+  var type = $("#select_mail_type").val();
+  if (type == 0) {
+    $("#mail_playernames").attr("disabled",false);
+    $("#mail_playernames").attr("placeholder","输入玩家名字");
+  }else{
+    $("#mail_playernames").attr("disabled",true);
+    $("#mail_playernames").attr("placeholder","拒绝输入");
+  }
+});
+});
+
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12" >
+      <div class="panel panel-info ">
+        <div class="panel-heading">游戏邮件</div>
+        <div class="panel-body">
+        <div class="col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">邮件内容</div>
+            <div class="panel-body">
+              <div class="form-horizontal">
+              <div class="form-group">
+                <label for="playername" class="col-md-3 control-label">服务器</label>
+                <div class="col-md-9">
+                  <select class="form-control1" id="mail_serverid">
+                    <option value="-1" selected="selected">-[-请选择服务器-]-</option>
+                    {% for svrid in servers %}
+                    <option value="{{svrid}}">{{servers[svrid]}}</option>
+                    {% end for %}
+                  </select>
+                </div>
+              </div> 
+              <div class="form-group">
+                <label for="select_mail_type" class="col-md-3 control-label">邮件类型</label>
+                <div class="col-md-9">
+                <select class="form-control1" id="select_mail_type">
+                  <option value="0" selected>针对个别玩家的邮件</option>
+                  <option value="1" >针对全服器玩家的邮件</option>
+                </select>      
+                </div>      
+                </div>                              
+              <div class="form-group">
+                <label for="playername" class="col-md-3 control-label">玩家名字</label>
+                <div class="col-md-9">
+                  <input type="text" id="mail_playernames" class="form-control1" placeholder="输入玩家名字">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="mailtitle" class="col-md-3 control-label">邮件标题</label>
+                <div class="col-md-9">
+                  <input type="text" id="mail_title" class="form-control1" >
+                </div>
+              </div>  
+              <div class="form-group">
+                <label for="mailcontent" class="col-md-3 control-label">邮件内容</label>
+                <div class="col-md-9">
+                  <input type="text" id="mail_content" class="form-control1">
+                </div>
+              </div> 
+              <div class="form-group">
+                <label for="mail_totime" class="col-md-3 control-label">到达时间</label>
+                <div class="col-md-4">
+                  <input type="text" id="mail_totime" class="form-control1"  placeholder="格式:yyyy-mm-dd" data-field="datetime" readonly>
+                </div>
+                <label for="timelong" class="col-md-2 control-label">有效期</label>
+                <div class="col-md-3">
+                  <input type="text" id="timelong" class="form-control1"  placeholder="格式:yyyy-mm-dd" data-field="datetime">
+                </div>                                 
+              </div>
+              <div class="form-group">
+                <div class="col-md-8">
+                  <select id="res_select" class="form-control1" style="font-size:24px;padding: 0px">
+                  <option value="0" selected="selected">-[-选择附加资源-]-</option>
+                  <option value="1">GM铜钱</option>
+                  <option value="2">GM元宝</option>
+                  <option value="4">GM体力</option>
+                  <option value="5">GM经验</option>
+                  <option value="6">GM真气</option>
+                  <option value="7">GM晶石</option>
+                  <option value="8">GM精力</option>
+                  </select>
+                </div>
+                <div class="col-md-2"><input type="text" id="res_num" class="col-md-12 form-control1 " placeholder="数量" /></div>
+                <div class="col-md-2"><button id="res_add" class="btn btn-primary form-control1">添加</button> </div>
+              </div>
+              <div class="form-group">
+                <div class="col-md-8">                    
+                  <input id = "item_select_input" class = "form-control1" style = "font-size:18px" placeholder="附加道具名"></input>
+                </div>
+                <div class="col-md-2"><input type="text" id="item_num" class="col-md-12 form-control1" placeholder="数量"/></div>
+                <div class="col-md-2"><button id="item_add" class="btn btn-primary form-control1">添加</button> </div>
+              </div>
+              <div class="form-group">
+              <div class="col-md-6"><button id="mailsubmit" class="col-md-12 btn btn-primary form-control1" data-toggle="modal"  data-target='#datadiv'>发送</button></div>
+              <div class="col-md-6"><button id="mailreset" class="col-md-12 btn btn-default form-control1">重置</button></div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="panel ">
+            <div class="panel-heading">邮件资源
+            </div>
+            <div class="panel-body">
+              <div class="row" id="res_content">                                         
+              </div>
+              <div class="row" id="item_content">               
+              </div>
+            </div>
+          </div>          
+        </div>
+        <div class="col-md-4">
+          <div class="panel ">
+            <div class="panel-heading">操作步骤</div>
+            <div class="panel-body">
+            1.选择对应的逻辑服务器</br>
+            2.输入需要发送的名字多个名字使用英文分号分割末尾以英文分号结束</br>
+            3.输入邮件标题字数控制在五个字范围内</br>
+            4.输入邮件内容字数控制在一百字范围内</br>
+            5.选择邮件发放到玩家时间</br>
+            6.输入邮件发放后可领取有效天数</br>
+            7.选择添加资源输入数量点击添加按钮</br>
+            8.选择添加道具输入数量点击添加按钮</br>
+            9.点击发送按钮即可发送邮件</br>
+            <font style="color: red">注意：</br>
+            1.如果不需要发送邮件资源或者道具不操作步骤7.8</br>
+            2.点击重置按钮会重新刷新界面</br></font>
+            </div>
+          </div>           
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">已发送邮件状态</div>
+        <div class="panel-body">
+          <table class="table">
+            <thead>
+              <tr>
+              <th class="col-md-2">服务器</th>
+              <th class="col-md-2">发送时间</th>
+              <th class="col-md-2">邮件类型</th>
+              <th class="col-md-6">邮件内容</th>
+              
+              </tr>
+            </thead>
+            <tbody>
+              {% for data in sendedmails %}
+              {% if data[12] == 1 %}
+              <tr class="success">
+              {% elif data[12] == 2 %}
+              <tr class="active">
+              {% else %}
+              <tr class="danger">
+              {% end if%}
+                <td>{{data[1]}}</td>
+                <td>{{data[9]}}</td>
+              {% if data[8] == 0 %}
+                <td>个人邮件</td>
+              {% else %}
+                <td>全服邮件</td>
+              {% end if %}
+                <td>收件人:{{data[3]}}</br>标题:{{data[4]}} 内容:{{data[5]}}</br>资源:{{data[6]}}{{data[7]}}</br>时间:{{data[10]}}   {{data[11]}}</td>
+                
+              </tr>
+              {% end for %}
+            </tbody>
+          </table>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+<div class="modal" id="datadiv">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">确定信息</h4>
+            </div>
+            <div class="modal-body">
+              确定需要发送该邮件吗？错了要扣工资哦！
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="submit_mail" class="btn btn-info" >发送</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+  </div>
+</div>
+{% end %}

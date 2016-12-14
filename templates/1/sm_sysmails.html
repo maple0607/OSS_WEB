@@ -1,0 +1,88 @@
+﻿{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+$(function(){
+  $("#sms_btn").click(function(){
+    var svrid = $("#sms_select").val();
+    var bgntime = $("#sms_begintime").val();
+    var endtime = $("#sms_endtime").val();
+    var plyname = $("#sms_playername").val();
+    var content1 = $("#sms_type").val();
+    if (bgntime != "" && endtime != "" && content1 != "-1") {
+      $.post("/gm/sms", {
+        "content": content1,
+        "svrid": svrid,
+        "bgntime": bgntime,
+        "endtime": endtime,
+        "plyname": plyname
+      }, function (data) {
+       $("#sms_content").html(data);
+      });
+    }
+    else {
+      alert("请正确填写参数")
+    }
+  });
+  $("#dtBox").DateTimePicker();
+});
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="panel panel-info">
+      <div class="panel-heading">系统邮件查询系统</div>
+      <div class="panel-body">
+        <div class="row">
+        <div class="input-group">
+          <div class="col-md-2">
+          <label for="sms_select">服务器</label>
+            <select id="sms_select">
+              <option value="-1">-[-请选择服务器-]-</option>
+              {% for svr in servers %}
+              <option value="{{svr}}">{{servers[svr]}}</option>
+              {% end for %}
+            </select>
+          </div> 
+          <div class="col-md-2">
+          <label for="sms_begintime">开始时间</label>
+            <input type="text" id="sms_begintime" data-field="datetime" placeholder="开始时间" readonly></input>
+          </div> 
+          <div class="col-md-2">
+          <label for="sms_endtime"></label>
+            <input type="text" id="sms_endtime" data-field="datetime" placeholder="结束时间" readonly></input>
+          </div>  
+          <div class="col-md-2">
+          <label for="sms_type">邮件类型</label>
+            <select id="sms_type">
+              <option value="-1">-[-请选择邮件类型-]-</option>
+              <option value="恭喜您在竞技场中位列">竞技场</option>
+              <option value="公会建设">公会建设</option>
+              <option value="无尽之塔">无尽之塔</option>
+              <option value="等级排名">等级排名</option>
+              <option value="战力排名">战力排名</option>
+              <option value="这是您今日受到万众敬仰，朝拜获得的礼品，请笑纳">膜拜</option>
+              <option value="在神奇转盘中排名达到了第">神奇转盘</option>
+              <option value="公会擂台">公会擂台</option>
+              <option value="公会密藏">公会密藏</option>
+              <option value="这是您占领">公会战每日</option>
+              <option value="恭喜你，占领了">公会战占领</option>
+              <option value="您在公会战中奋力一战，占领了据点。这是您的个人奖励">公会个人</option>
+            </select>
+          </div>           
+          <div class="col-md-2">
+          <label for="sms_playername">玩家名</label>
+            <input type="text" id="sms_playername" placeholder="玩家名"></input>
+          </div>   
+          <button class="btn btn-info" id="sms_btn">查询</button>                          
+        </div>
+        </div>
+        <div class="row">
+        <div class="col-md-12" id="sms_content"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+{% end block %}

@@ -1,0 +1,61 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+
+function refreshGraph()
+{
+   var svrid = $("#svr_select").val();
+   var guildname = $("#guildname").val();
+   if (guildname != "")
+      $.post("/gm/guildinfo",{
+      "svrid":svrid,
+      "guildname":guildname
+      }, function(data){
+         
+        //$('#container_count').hide();
+        $('#container_count1').show();
+        $('#container_count1').text("");
+        $('#container_count1').append(data);
+      });
+}
+
+$(function(){
+  $("#dtBox").DateTimePicker();
+});
+
+</script>
+
+<div class="graphs">
+  <div class="row">
+    <div class="panel panel-info">
+      <div class="panel-heading">公会详细信息</div>
+      <div class="panel-body">
+        <div class="row">
+        <div class="input-group">
+          <div class="col-md-3">
+          <label for="svr_select">服务器：</label>
+          <select id="svr_select">
+            <option value="-1">-[-请选择服务器-]-</option>
+            {% for k in servers %}
+            <option value="{{k}}">{{servers[k]}}</option>
+            {% end for %}
+          </select>
+          </div>
+          <div class="col-md-8">
+            <label for="guildname">公会名字:</label>
+            <input type="text" id="guildname" placeholder="公会名字"></input>
+            <button class="btn btn-info" id="btn_query" onclick='refreshGraph()'> 查询</button> 
+          </div>
+        </div>
+        </div>
+        <div class="row">
+        
+        <div id="container_count1" class="col-md-12" style="height: 600px; overflow:scroll"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+{% end block %}

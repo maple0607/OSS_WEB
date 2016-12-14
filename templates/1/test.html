@@ -1,0 +1,109 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script type="text/javascript">
+$(function(){
+  //生成测试帐号 start
+  $("#submit").click(function(){
+    var username = $("#username").val();
+    var password = $(" #password").val();
+    $.post("/gm/testaccount", {
+      "username":username,
+      "password":password
+    }, function(data){
+      alert(data);
+    });
+  });
+  //生成测试帐号 end
+
+  $("#btn_check").click(function(){
+    var rolename = $("#rolename").val();
+    var serverid = $("#select_serverid").val();
+    $.post("/gm/testrecharge", {
+      "optype":"check",
+      "rolename":rolename,
+      "serverid":serverid
+    },function(data){
+      $("#label_checkname").text(data);
+    });
+  });
+
+  $("#btn_charge").click(function(){
+      var rolename = $("#rolename").val();
+      var serverid = $("#select_serverid").val();
+      var productId =$("#select_productid").val();
+      $.post("/gm/testrecharge", {
+        "optype":"recharge",
+        "rolename":rolename,
+        "serverid":serverid,
+        "productid":productId
+      },function(data){
+        $("#label_checkname").text(data);
+      });      
+  });
+});
+
+
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-1">
+      <div class="Compose-Message">
+        <div class="panel panel-default">
+          <div class="panel-heading"> 生成测试账号 </div>
+          <div class="panel-body"> 
+            <div class="form-group">
+              <label for="username">帐号</label>
+              <input id="username" type="text" class="form-control1"/>
+            </div>
+            <div class="form-group">
+              <label for="password">密码</label>
+              <input id="password" type="text" class="form-control1"/>
+            </div>  
+            <button id="submit" class="btn btn-info col-md-12">生成</button>      
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-md-offset-1">
+      <div class="Compose-Message">
+        <div class="panel panel-default">
+          <div class="panel-heading"> 测试充值 </div>
+          <div class="panel-body"> 
+          <div class="form-group">
+              <label  >选择服务器</label>
+              <select id="select_serverid" class="form-control1">
+              {% for svrid in servers %}
+                <option value="{{svrid}}">{{servers[svrid]}}</option>
+              {% end for %}  
+              </select>
+            </div> 
+            <div class="form-group">
+              <label for="rolename">角色名</label>
+              <input id="rolename" type="text" class="form-control1"/>
+            </div>
+            <div class="form-group">
+              <label  id="label_checkname">请检查用户是否存在</label>
+              <button id="btn_check" class="btn btn-info col-md-12" >检测</button>
+            </div>
+            <div class="form-group">
+              <label for="" >充值档位</label>
+              <select id="select_productid" class="form-control1">
+                <option value="GD201512071352993">₩1100 [60원보]</option>
+                <option value="GD201512071310081">₩5500 [300원보]</option>
+                <option value="GD201512071339592">₩11000 [600원보]</option>
+                <option value="GD201512071353011">₩33000 [1800원보]</option>
+                <option value="GD201512071374840">₩55000 [3000원보]</option>
+                <option value="GD201512071383539">₩110000 [6000원보]</option>
+                <option value="GD201512071369736">₩成长基金</option>
+              </select>
+            </div>  
+            <button id="btn_charge" class="btn btn-info col-md-12" >充值</button>      
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+
+{% end %}

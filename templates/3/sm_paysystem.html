@@ -1,0 +1,49 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+
+$(function(){
+  //load info  scripts
+
+  $("#bt_ordercheck").click(function(){
+      $.post("/gm/orderinfo",
+      {
+          "optype":$("#paramtype").val(),
+          "opinfo":$("#paraminfo").val()
+      },
+      function(data){
+        $("#resultinfo").html(data);
+      }
+      )
+  });
+});
+
+</script>
+
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">订单数据查询</div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-3">
+            查询类型:
+              <select id="paramtype">
+                <option value="Name">角色名</option>
+                <option value="TransactionID">订单号</option>
+              </select>
+            </div>
+            <div class="col-md-3">查询参数:<input type="text" id="paraminfo"/></div>
+            <div class="col-md-2"><button id="bt_ordercheck">查询</button></div>
+          </div>
+          <div id="resultinfo" class="row">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+{% end block %}

@@ -1,0 +1,64 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script type="text/javascript">
+  $(function(){
+    $("#loginedit").click(function(){
+      $("#logintext").attr("readonly",false);
+    });
+    
+  });
+  function OneMinuteEvent(){
+    window.location.reload();
+  }
+  setInterval("OneMinuteEvent()", 60000);
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="Compose-Message">
+        <div class="panel panel-default">
+          <div class="panel-heading"> 服务器状态 </div>
+          <div class="panel-body"> 
+            <!--beging wedget-->
+            <div class="widget_1"> 
+              {% for svr in svrgroup%}
+              <div class="col-sm-2 widget_1_box">
+                <div class="tile-progress bg-info">
+                  <div class="content">
+                    <h4><i class="fa fa-bookmark"></i> {{svr[0]}} {{svr[1]}}</h4>
+                    {% if svr[5] %}
+                     <div class="col-sp-12 bg-red" >
+                     GS: O:{{svr[2]}} M:{{svr[3]}} A:{{svr[4]}}
+                    {% else %}
+                      <div class="col-sp-12 bg-green" >
+                      GS:宕机ING
+                    {% end if%}
+                   
+                    
+                    </div> 
+                    {% if svr[6]  > -1 %}
+                    <div class="col-sp-12 bg-red" >
+                    amount:{{svr[6]}}
+                    {% else %}
+                    <div class="col-sp-12 bg-green" >
+                    amount:-1
+                    {% end if%}
+                    
+                    
+                    </div> 
+                  </div>
+                </div>
+
+              </div>
+              {% end for%} 
+            </div>
+            <!--beging wedget--> 
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="clearfix"> </div>
+</div>
+</div>
+{% end %}

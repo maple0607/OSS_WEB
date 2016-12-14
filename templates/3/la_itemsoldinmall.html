@@ -1,0 +1,82 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+
+function refreshGraph()
+{
+   var bgntime = $("#log_begintime").val();
+   var endtime = $("#log_endtime").val();
+   var graphstyle = $("#style_select").val();
+   if (graphstyle != "" && bgntime != "" && endtime != "")
+      $.post("/gm/la_itemsoldinmall",{
+      "bgntime":bgntime,
+      "endtime":endtime,
+      "style":graphstyle,
+      }, function(data){
+         if (data.result.ok)
+         {
+           if(graphstyle == -1)
+           {
+              $('#container_count').hide();
+              $('#container_count1').show();
+              $('#container_count1').text("");
+              $('#container_count1').append(data.result.content);
+           }
+           else
+           {
+             $('#container_count').show();
+             $('#container_count1').hide();
+             $('#container_count').highcharts(data.result.count);
+           }
+//            $('#container_count').highcharts(data.result.count);
+         }
+         else
+         {
+            alert("Query format is error!");
+         }
+      },"json");
+}
+
+$(function(){
+  $("#dtBox").DateTimePicker();
+});
+
+</script>
+
+<div class="graphs">
+  <div class="row">
+    <div class="panel panel-info">
+      <div class="panel-heading">商城道具售卖情况</div>
+      <div class="panel-body">
+        <div class="row">
+        <div class="input-group">
+          <div class="col-md-2">
+          <label for="log_begintime">开始时间：</label>
+            <input type="text" id="log_begintime" data-field="date" placeholder="开始时间" readonly onchange='refreshGraph()'></input>
+          </div>
+          <div class="col-md-2">
+          <label for="log_endtime">结束时间：</label>
+            <input type="text" id="log_endtime" data-field="date" placeholder="结束时间" readonly onchange='refreshGraph()'></input>
+          </div>
+          <div class="col-md-2">
+          <label for="style_select">图表样式：</label>
+            <select id="style_select" onchange='refreshGraph()'>
+              <option value="-1">-[-请选择图表样式-]-</option>
+              {% for k in styles %}
+              <option value="{{k}}">{{styles[k]}}</option>
+              {% end for %}
+            </select>
+          </div>
+        </div>
+        </div>
+        <div class="row">
+        <div id="container_count" style="height: 600px"></div>
+          <div id="container_count1" class="col-md-12" style="height: 600px; overflow:scroll"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+{% end block %}

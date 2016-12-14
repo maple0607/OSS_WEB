@@ -1,0 +1,51 @@
+{% extends "base2.html" %}
+{% block content %}
+<script type="text/javascript">
+$(function(){
+  $("#debug_submit").click(function(){
+    var svrId = $("#serverinfo").val()
+    var content = $("#debug_content").val()
+    $.post("/gm/serverdebug",{
+        "svrid":svrId,
+        "content":content
+    },function(data){
+      $("#debug_result").val(data);
+    });
+  });
+});
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-info ">
+        <div class="panel-heading">服务器列表管理</div>
+        <div class="panel-body">
+        <div class="col-md-6">
+                     <div class="input-group">
+              <label>调试内容</label>
+              <textarea id="debug_content" class="col-xs-12"  rows="25"></textarea>
+              <select id = "serverinfo">
+                <option value="-1">--请选择服务器--</option>
+                {% for svrid in servers %}
+                <option value="{{svrid}}">{{servers[svrid]}}</option>
+                {% end for%}
+              </select>
+              <button id="debug_submit" name="" class="btn btn-info col-xs-12">发送</button>
+            </div>
+        </div>
+                <div class="col-md-6">
+                     <div class="input-group">
+              <label>调试结果</label>
+              <textarea id="debug_result" class="col-xs-12" disabled="disabled"  style="resize:none" rows="25"></textarea>
+
+            </div>
+        </div>
+        <div class="col-md-6">
+          
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% end %}

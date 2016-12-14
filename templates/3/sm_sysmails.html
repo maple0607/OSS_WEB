@@ -1,0 +1,88 @@
+﻿{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+$(function(){
+  $("#sms_btn").click(function(){
+    var svrid = $("#sms_select").val();
+    var bgntime = $("#sms_begintime").val();
+    var endtime = $("#sms_endtime").val();
+    var plyname = $("#sms_playername").val();
+    var content1 = $("#sms_type").val();
+    if (bgntime != "" && endtime != "" && content1 != "-1") {
+      $.post("/gm/sms", {
+        "content": content1,
+        "svrid": svrid,
+        "bgntime": bgntime,
+        "endtime": endtime,
+        "plyname": plyname
+      }, function (data) {
+       $("#sms_content").html(data);
+      });
+    }
+    else {
+      alert("请正确填写参数")
+    }
+  });
+  $("#dtBox").DateTimePicker();
+});
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="panel panel-info">
+      <div class="panel-heading">系统邮件查询系统</div>
+      <div class="panel-body">
+        <div class="row">
+        <div class="input-group">
+          <div class="col-md-2">
+          <label for="sms_select">서버</label>
+            <select id="sms_select">
+              <option value="-1">-[-서버를 선택해 주세요-]-</option>
+              {% for svr in servers %}
+              <option value="{{svr}}">{{servers[svr]}}</option>
+              {% end for %}
+            </select>
+          </div> 
+          <div class="col-md-2">
+          <label for="sms_begintime">시작 시간</label>
+            <input type="text" id="sms_begintime" data-field="datetime" placeholder="시작 시간" readonly></input>
+          </div> 
+          <div class="col-md-2">
+          <label for="sms_endtime"></label>
+            <input type="text" id="sms_endtime" data-field="datetime" placeholder="종료 시간" readonly></input>
+          </div>  
+          <div class="col-md-2">
+          <label for="sms_type">로그 종류</label>
+            <select id="sms_type">
+              <option value="-1">-[-로그 종류 선택-]-</option>
+              <option value="위를 차지했습니다">竞技场</option>
+              <option value="길드의 건설 보상으로">公会建设</option>
+              <option value="오늘 무한의 탑에서">无尽之塔</option>
+              <option value="7일 레벨 랭킹 이벤트">等级排名</option>
+              <option value="7일 전투력 랭킹 이벤트">战力排名</option>
+              <option value="대중의 흠모와 존경을 받아">膜拜</option>
+              <option value="신비 룰렛에서">神奇转盘</option>
+              <option value="길드가 길드대전에서">公会擂台</option>
+              <option value="길드 이벤트: 길드 보물상자">公会密藏</option>
+              <option value="길드전 일일 보상">公会战每日</option>
+              <option value="을(를) 점령한 수익입니다">公会战占领</option>
+              <option value="전에서 격렬한 전투를">公会个人</option>
+            </select>
+          </div>           
+          <div class="col-md-2">
+          <label for="sms_playername">게이머 이름 입력</label>
+            <input type="text" id="sms_playername" placeholder="게이머 이름 입력"></input>
+          </div>   
+          <button class="btn btn-info" id="sms_btn"> 조회</button>                          
+        </div>
+        </div>
+        <div class="row">
+        <div class="col-md-12" id="sms_content"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+{% end block %}

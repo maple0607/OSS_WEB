@@ -1,0 +1,256 @@
+{% extends "base2.html" %}
+{% block content %}
+<script type="text/javascript">
+  $(function(){
+    $("#dtBox").DateTimePicker();
+    $("#sendnew").click(function(){
+      var svrid = $("#svrid").val()
+      var svrname = $("#svrname").val()
+      var svrip = $("#svrip").val()
+      var svrport = $("#svrport").val()
+      var authurl = $("#authurl").val()
+      var oldid = $("#oldid").val()
+      $.post("/gm/serverlist",{
+        "optype":"add",
+        "svrid":svrid,
+        "svrname":svrname,
+        "svrip":svrip,
+        "svrport":svrport,
+        "authurl":authurl,
+        "oldsvrid":oldid
+      },function(data){
+          alert(data);
+          $('#newservermodal').modal('hide');
+          window.location.reload();
+      });
+    });
+    $(".delthis").click(function(){
+      var svrid = $(".delthis").parent().prev().prev().prev().prev().prev().prev().prev().prev().text();
+      var oldid = $(".delthis").parent().prev().text();
+      $.post("/gm/serverlist",{
+        "optype":"delete",
+        "svrid":svrid,
+        "oldid":oldid
+      },function(data){
+        alert(data);
+        window.location.reload();
+      });
+    });
+  });
+function openClose(index, status){
+  $.post("/gm/serverlist",{
+          "optype":"openclose",
+          "index":index,
+          "status":status
+        },function(data){
+          window.location.reload();
+        });
+}
+function updateServer(index, status){
+  $.post("/gm/serverlist",{
+          "optype":"update",
+          "index":index,
+          "status":status
+        },function(data){
+          window.location.reload();
+        });
+}
+function delServer(index){
+            $.post("/gm/serverlist",{
+          "optype":"delete",
+          "index":index,
+        },function(data){
+          alert(data);
+          window.location.reload();
+        });
+}
+function moveServer(index, action){
+  $.post("/gm/serverlist",{
+          "optype":"move",
+          "index":index,
+          "action":action
+        },function(data){
+          window.location.reload();
+        });
+}
+function opencloseAll(optype){
+  $.post("/gm/serverlist",{
+          "optype":optype,
+        },function(data){
+          window.location.reload();
+        });
+}
+function sortWithOrder(reverse){
+  $.post("/gm/serverlist",{
+          "optype":"sort",
+          "reverse":reverse
+        },function(data){
+          window.location.reload();
+        });
+}
+function revert(opt){
+  var fn = $("#backup_select").val();
+  $.post("/gm/serverlist",{
+      "optype":opt,
+      "fn": fn
+    },function(data){
+      window.location.reload();
+    });
+}
+function changepolicy(){
+  $.post("/gm/serverlist",{
+      "optype":"changesimplepolicy"
+    },function(data){
+      window.location.reload();
+    });
+}
+
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-info ">
+        <div class="panel-heading">服务器列表管理</div>
+        {% if isPreviewRevert == False %}
+        <div class="row" style = "padding-top:16px">
+          <div class="col-md-6" style = "padding-left:32px">
+            <button id= "addnewserver" class='btn btn-info' data-toggle="modal"  data-target='#newservermodal'>添加新服务器</button>
+            <button id= "sortwithorder" class='btn btn-info' onclick="sortWithOrder(0)">按区服编号升序排列</button>
+             <button id= "sortwithorderrvs" class='btn btn-info' onclick="sortWithOrder(1)">按区服编号降序排列</button>
+             <button id= "statepolicy" class='btn btn-info' onclick="changepolicy()">{{policy}}</button>
+          </div>
+          <div class="col-md-2 col-md-offset-4">
+            <button id= "closeall" class='btn btn-danger' onclick="opencloseAll('closeall')">一键维护</button>
+            <button id= "allopen" class='btn btn-danger' onclick="opencloseAll('openall')">一键运行</button>
+          </div>
+        </div>
+        {% end if %}
+        <hr class="col-md-12" ></hr>
+        <label style = "padding-left:16px" for="backup_select" style="padding:3px">备份还原：</label>
+        <select id="backup_select">
+          {% for k in backup %}
+            {% if k[0] == curView %}
+              <option value="{{k[0]}}" selected style="background:#1f7fff">{{k[1]}}</option>
+            {% else %}
+              <option value="{{k[0]}}">{{k[1]}}</option>
+            {% end if %}
+          {% end for %}
+        </select>
+        <button  class='btn btn-info' onclick="revert('previewrevert')">预览</button>
+        {% if isPreviewRevert == True %}
+          <button  class='btn btn-danger' class='btn btn-info' onclick="revert('confirmrevert')">确认还原</button>
+          <button  class='btn btn-info' class='btn btn-info' onclick="revert('cancelrevert')">取消预览</button>
+        {% end if %}
+        <div class="panel-body">
+          <table class="table table-bordered no-margin">
+            <thead>
+              <tr>
+                <th>服务器ID</th>
+                <th>服务器名字</th>
+                <th>服务器IP</th>
+                <th>服务器端口</th>
+                <th>验证IP</th>
+                <th>运行状态</th>
+                <th>区服编号</th>
+                <th>原始ID</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for server in serverlist %}
+            <tr>
+              <td>{{server[0][0]}}</td>
+              <td>{{server[0][1]}}</td>
+              <td>{{server[0][2]}}</td>
+              <td>{{server[0][3]}}</td>
+              <td>{{server[0][4]}}</td>
+              <td>
+              <select onchange="openClose({{server[1]}}, this.options[this.options.selectedIndex].value)">
+                {% if server[0][5] == 1 %}
+                  <option value="1" selected>运行</option>
+                  <option value="0">维护</option>
+                {% else %}
+                  <option value="1">运行</option>
+                  <option value="0" selected>维护</option>
+                {% end if %}
+              </select>
+              {% if server[0][5] == 1 %}
+              <select onchange="updateServer({{server[1]}}, this.options[this.options.selectedIndex].value)" >
+                {% if server[0][6] == 1 %}
+                  <option value="1" selected="selected">良好</option>
+                  <option value="2">爆满</option>
+                  <option value="3">火爆</option>
+                  <option value="4">新增</option>
+                  <option value="5">推荐</option>
+                {% elif server[0][6] == 2 %}
+                  <option value="1" >良好</option>
+                  <option value="2" selected="selected">爆满</option>
+                  <option value="3">火爆</option>
+                  <option value="4">新增</option>
+                  <option value="5">推荐</option>
+                {% elif server[0][6] == 3 %}
+                  <option value="1">良好</option>
+                  <option value="2">爆满</option>
+                  <option value="3" selected="selected">火爆</option>
+                  <option value="4">新增</option>
+                  <option value="5">推荐</option>
+                {% elif server[0][6] == 4 %}
+                  <option value="1">良好</option>
+                  <option value="2">爆满</option>
+                  <option value="3">火爆</option>
+                  <option value="4" selected="selected">新服</option>
+                  <option value="5">推荐</option>
+                {% else %}
+                  <option value="1">良好</option>
+                  <option value="2">爆满</option>
+                  <option value="3">火爆</option>
+                  <option value="4">新增</option>
+                  <option value="5" selected="selected">推荐</option>
+                {% end if %}
+              </select>
+              {% end if %}
+              </td>
+              <td>{{server[0][9]}}服</td>
+              <td>{{server[0][10]}}</td>
+              <td>
+                <button  class='btn btn-info' onclick="moveServer({{server[1]}}, 'up')">↑</button>
+                <button  class='btn btn-info' onclick="moveServer({{server[1]}}, 'top')">↑↑</button>
+                <button  class='btn btn-info' onclick="moveServer({{server[1]}}, 'down')">↓</button>
+                <button  class='btn btn-info' onclick="moveServer({{server[1]}}, 'bottom')">↓↓</button>
+                <button  class='btn btn-danger' onclick="delServer({{server[1]}})">删除</button>
+              </td>
+            </tr>
+            {% end for%}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="newservermodal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">新服务器添加信息</h4>
+            </div>
+            <div class="modal-body">
+                <label>服务器ID<input id="svrid" type="text" /></label>
+                <label>服务器名字<input id='svrname' type="text" /></label><br/>
+                <label>服务器IP<input id='svrip' type="text" /></label>
+                <label>服务器PORT<input id='svrport' type="text" /></label><br/>
+                <label>验证服URL<input id='authurl' type="text" /></label>
+                <label>使用ID<input id='oldid'type="text" /></label>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="sendnew" class="btn btn-info" >提交到服务器</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+{% end %}

@@ -1,0 +1,93 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+$(function(){
+  $("#log_btn").click(function(){
+    var svrid = $("#log_select").val();
+    var bgntime = $("#log_begintime").val();
+    var endtime = $("#log_endtime").val();
+    var plyname = $("#log_playername").val();
+    var action = $("#log_type").val();
+    if (bgntime != "" && endtime != "" && plyname != "") {
+      $.post("/gm/playerlog", {
+        "action": action,
+        "svrid": svrid,
+        "bgntime": bgntime,
+        "endtime": endtime,
+        "plyname": plyname
+      }, function (data) {
+        $("#log_content").children("tbody").text("");
+        var content = "";
+        $.each(data.result, function (k, v) {
+          content = content + "<tr><td>" + v.Time + "</td><td>" + v.Content + "</td></tr>";
+
+        });
+        $("#log_content").children("tbody").append(content);
+      }, "json");
+    }
+    else {
+      alert("请正确填写参数")
+    }
+  });
+  $("#dtBox").DateTimePicker();
+});
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="panel panel-info">
+      <div class="panel-heading">玩家日志查询</div>
+      <div class="panel-body">
+        <div class="row">
+        <div class="input-group">
+          <div class="col-md-2">
+          <label for="log_select">服务器</label>
+            <select id="log_select">
+              <option value="-1">-[-请选择服务器-]-</option>
+              {% for svr in servers %}
+              <option value="{{svr}}">{{servers[svr]}}</option>
+              {% end for %}
+            </select>
+          </div> 
+          <div class="col-md-2">
+          <label for="log_begintime">开始时间</label>
+            <input type="text" id="log_begintime" data-field="datetime" placeholder="开始时间" readonly></input>
+          </div> 
+          <div class="col-md-2">
+          <label for="log_endtime"></label>
+            <input type="text" id="log_endtime" data-field="datetime" placeholder="结束时间" readonly></input>
+          </div>  
+          <div class="col-md-2">
+          <label for="log_type">日志类型</label>
+            <select id="log_type">
+              <option value="-1">-[-选择日志类型-]-</option>
+              {% for k in types %}
+              <option value="{{k}}">{{types[k]}}</option>
+              {% end for %}
+            </select>
+          </div>           
+          <div class="col-md-2">
+          <label for="log_playername">玩家名字</label>
+            <input type="text" id="log_playername" placeholder="玩家名字"></input>
+          </div>   
+          <button class="btn btn-info" id="log_btn"> 查询</button>                          
+        </div>
+        </div>
+        <div class="row">
+          <table class="table" id="log_content">
+            <thead>
+              <tr>
+              <th class="col-md-2">日志时间</th>
+              <th class="col-md-10">日志内容</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+{% end block %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<body id="login">
+  <div class="login-logo">
+    <a href="#"><img src="{{static_url('images/logo.png')}}" alt=""/></a>
+  </div>
+  <h2 class="form-heading" style="color: red">功夫少林管理系统OSS</h2>
+  <div class="app-cam">
+    <form action="/gm/login" method="post">
+    <input type="text" name="username" class="text" placeholder="输入系统帐号" style="font-size: 20px">
+    <input type="password" name="password" placeholder="输入系统密码" style="font-size: 20px">
+    <div class="submit"><input type="submit" value="登入系统"></div>
+    <ul class="new">
+      <h3 style="color: red">{{error}}</h3>
+      <div class="clearfix"></div>
+    </ul>
+  </form>
+  </div>
+   <div class="copy_layout login">
+      <p>Copyright © 2016 Modern. All Rights Reserved | Design by <a href="http://my.oschina.net/zhaolu0607/blog" target="_blank">程序员也懂浪漫</a> </p>
+   </div>
+</body>
+{% end %}

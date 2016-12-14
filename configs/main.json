@@ -1,0 +1,60 @@
+{
+    "ServicePort": 80,
+    "Debug": true,
+    "Game":{
+        "MaxPlayers": -1,
+		"Version":"1.9.1",
+		"Verson_TS":["1.7.1", "1", "120.92.226.91", "8899"],
+		"AD":false
+    },
+    "PermissionIP":[
+        "127.0.0",
+        "192.168.",
+        "221.237.157.134"
+    ],
+    "WhiteList":[
+    ],
+    "Redis": {
+        "Hostname": "192.168.0.247",
+        "Hostport": 6379,
+        "Database": 0,
+        "Password1": "!@#%$TASDFASDF@!#%QWEFQ@#$"
+    },
+    "WebCenter": {
+        "Hostname": "192.168.0.247",
+        "Hostport": 3306,
+        "Username": "root",
+        "Password": "123456",
+        "Database": "wencenter",
+        "Connections": 40
+    },
+    "GmDb": {
+        "Hostname": "192.168.0.247",
+        "Hostport": 3306,
+        "Username": "root",
+        "Password": "123456",
+        "Database": "gmdb",
+        "Connections": 40
+    },
+    "AccDB": {
+        "Hostname": "192.168.0.247",
+        "Hostport": 3306,
+        "Username": "root",
+        "Password": "123456",
+        "Database": "AccDB",
+        "Connections": 40
+    },
+    "AnaDB": {
+        "Hostname": "192.168.0.247",
+        "Hostport": 3306,
+        "Username": "root",
+        "Password": "123456",
+        "Database": "QueryResult",
+        "Connections": 10
+    },
+	"ServerList":["configs/serverlist.txt","configs/serverlist_test.txt"],
+	"GMServerUrl":"http://192.168.0.248:8085/",
+	"GMServerKey":"gamewithoutborder",
+	"PayServerAddr":"http://192.168.0.248:8089/",
+	"ItemsDir":"configs/itemdata"
+}

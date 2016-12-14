@@ -1,0 +1,279 @@
+{% extends "base2.html" %}
+{% block content %} 
+<script language="javascript">
+$(function(){
+   $("#dtBox").DateTimePicker();
+	$("#login_edit").click(function(){
+		$("#login_text").removeAttr("disabled");
+		});
+	$("#login_submit").click(function(){
+		var boadval = $("#login_text").val()
+		$.post("/gm/boardorbusy",{
+			"optype":1,
+			"board":boadval
+			},
+			function(data){
+				alert(data);
+				});
+			});
+	$("#game_reset").click(function(){
+		$("#game_board").val('');
+		});
+	$("#game_submit").click(function(){
+		var svrid=$("#game_board_server").val();
+		var begin = $("#game_board_begin").val();
+		var title = $("#game_board_title").val();
+		var content = $("#game_board").val();
+        if (svrid != "" && begin != "" && title != "" && content != "") {
+          $.post("/gm/boardorbusy", {
+                    "optype": 2,
+                    "svrid": svrid,
+                    "beginday": begin,
+                    "title": title,
+                    "content": content
+                  },
+                  function (data) {
+                    alert(data);
+                  });
+        }
+        else {
+          alert("请正确填写参数")
+        }
+            });
+	$("#gamehorse_reset").click(function(){
+		$("#gamehorse_text").val('');
+		});
+	$("#gamehorce_submit").click(function(){
+		var svrid=$("#gamehorse_server").val();
+		var begin = $("#gamehorse_begin").val();
+		var end = $("#gamehorse_end").val();
+		var circle = $("#gamehorse_circle").val();
+		var content = $("#gamehorse_text").val();
+        if (begin != "" && end != "" && circle != 0 && content != "") {
+          $.post("/gm/boardorbusy", {
+                    "optype": 3,
+                    "svrid": svrid,
+                    "beginday": begin,
+                    "endday": end,
+                    "circle": circle,
+                    "content": content
+                  },
+                  function (data) {
+                    alert(data);
+                  });
+        }
+        else {
+          alert("请正确填写参数")
+        }
+		});
+	$("#find_info_submit").click(function(){
+		var svrid = $("#find_info_select").val();
+		var type = $("#find_info_type").val();
+		$.post("/gm/boardorbusy",{
+			"optype":4,
+			"svrid":svrid,
+			"cnttype":type
+			},
+			function(jdata){
+				$("#info_table").find("tbody").empty();
+				if(jdata.length != 0)
+				{
+					$("#table_info_notice").val('');
+				}else
+				{
+					$("#table_info_notice").val('：）未查询到可用数据（：');
+				}
+				$.each(jdata.listdata,function(i, item){
+					
+					$("#info_table").find("tbody").append("<tr><td>"+item.uid+"</td><td>"+item.notice+"</td><td><button class='btn btn-danger' onclick='delOneInfo(\""+item.uid+"\")'>删除</button></td></tr>")
+					});
+			},"json");
+		});
+    $("#gamesys_reset").click(function(){
+      $("#gamesys_text").val("");
+    });
+    $("#gamesys_submit").click(function(){
+      var svrid = $("#gamesys_server").val();
+      var content = $("#gamesys_text").val();
+      $.post("/gm/boardorbusy",{
+        "optype":6,
+        "svrid":svrid,
+        "content":content
+      },function(data){
+        alert(data);
+      });
+    });
+	});
+	
+function delOneInfo(uid){
+	var svrid = $("#find_info_select").val();
+	var type = $("#find_info_type").val();
+	$.post("/gm/boardorbusy",{
+			"optype":5,
+			"infotype":type,
+			"svrid":svrid,
+			"uid":uid
+
+			},
+			function(data){
+				alert(data);
+				});
+	}
+
+</script>
+<div class="graphs">
+  <div class="row">
+    <div class="col-md-12" >
+      <div class="panel panel-info ">
+        <div class="panel-heading">公告与跑马灯</div>
+        <div class="panel-body">
+          <div class="col-md-4">
+            <div class="panel panel-default">
+              <div class="panel-heading">登录公告</div>
+              <div class="panel-body">
+                <div class="input-group">
+                  <textarea id="login_text" class="col-xs-12" disabled="disabled"  style="resize:none" rows="17" placeholder="登录公告内容">{{loginboard}}</textarea>
+                </div>
+                <div class="input-group">
+                  <button id="login_edit" name="" class="btn btn-danger col-xs-3">启用编辑</button>
+                  <button id="login_submit" name="" class="btn btn-info col-xs-3 col-md-offset-6">发送</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel panel-default">
+              <div class="panel-heading">游戏内公告</div>
+              <div class="panel-body">
+                <div class="input-group"> 服务器:
+                  <select  id="game_board_server">
+                    <option selected="selected" value="-1">--选择区服--</option>
+                    {% for svrid in servers %}             
+                    <option value="{{svrid}}">{{servers[svrid]}}</option>
+                    {% end for%}
+                  </select>
+                  生效日期:
+                  <input id="game_board_begin" type="text" size="15px" placeholder="格式:yyyy-mm-dd" data-field="datetime" readonly />
+                </div>
+                <div class="input-group">
+                  <input id="game_board_title" type="text"   class="col-xs-12" placeholder="公告标题(四个字)" />
+                </div>
+                <div class="input-group">
+                  <textarea id="game_board" class="col-xs-12"  style="resize:none" rows="13" placeholder="公告内容"></textarea>
+                </div>
+                <div class="input-group">
+                  <button id="game_reset" name="" class="btn btn-danger col-xs-3">重置</button>
+                  <button id="game_submit" name="" class="btn btn-info col-xs-3 col-md-offset-6">发送</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="row">
+              <div class="panel panel-default">
+                <div class="panel-heading">游戏跑马灯</div>
+                <div class="panel-body">
+
+                  <div class="input-group">
+                   <div class="col-xs-5">
+                      <label for="gamehorse_server">服务器</label>
+                      <select id="gamehorse_server">
+                      <option selected="selected" value="-1">--选择区服--</option>
+                      {% for svrid in servers %}
+                      <option value="{{svrid}}">{{servers[svrid]}}</option>   
+                      {% end for%}
+                    </select>
+                   </div>
+                   <div class="col-xs-7">
+                   <label for="gamehorse_circle">周期</label>
+                    <select id="gamehorse_circle">
+                      <option selected="selected" value="0">--请选择循环周期--</option>
+                      <option value="60">1分钟(维护等高频信息)</option>
+                      <option value="300">5分钟(通知等游戏信息)</option>
+                      <option value="1800">30分钟(活动等推送信息)</option>
+                    </select>                     
+                   </div>
+
+                  </div>
+                  <div class="input-group">
+                    开始时间:<input id="gamehorse_begin" type="text" size="15px" placeholder="格式:yyyy-mm-dd" data-field="datetime" readonly/>
+                    结束时间:<input id="gamehorse_end" type="text"  size="15px" placeholder="格式:yyyy-mm-dd" data-field="datetime" readonly/>
+                  </div>
+                  <div class="input-group">
+                    <input id="gamehorse_text" type="text" class="col-xs-12" placeholder="跑马灯内容" />
+                  </div>
+                  <div class="input-group">
+                    <button id="gamehorse_reset" name="" class="btn btn-danger col-xs-3">重置</button>
+                    <button id="gamehorce_submit" name="" class="btn btn-info col-xs-3 col-md-offset-6">发送</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="panel panel-default">
+                <div class="panel-heading">系统消息</div>
+                <div class="panel-body">
+                  <div class="input-group"> 区服:
+                    <select id="gamesys_server">
+                      <option selected="selected" value="-1">--选择区服--</option>
+                      {% for svrid in servers %}
+                      <option value="{{svrid}}">{{servers[svrid]}}</option> 
+                      {% end for%}
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <input id="gamesys_text" type="text" class="col-xs-12"  placeholder="系统聊天消息内容" />
+                  </div>
+                  <div class="input-group">
+                    <button id="gamesys_reset" name="" class="btn btn-danger col-xs-3">重置</button>
+                    <button id="gamesys_submit" name="" class="btn btn-info col-xs-3 col-md-offset-6">发送</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-info ">
+      <div class="panel-heading">公告||跑马灯 查询</div>
+      <div class="panel-body">
+        <label class="col-xs-12" >查询项目（
+          查询区服:
+          <select id="find_info_select">
+            <option selected="selected" value="-1">--选择区服--</option>
+            {% for svrid in servers %}
+            <option value="{{svrid}}">{{servers[svrid]}}</option>
+            {% end for%}
+          </select>
+          </select>
+          查询类型:
+          <select class="" id="find_info_type">
+            <option value="1">公告</option>
+            <option value="2">跑马灯</option>
+          </select>
+          <button id="find_info_submit" class="btn btn-primary">查询</button>
+          ）</label>
+        <table id="info_table" class="table">
+          <thead>
+            <tr>
+              <th>编码</th>
+              <th>内容</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <label id="table_info_notice" class="col-md-4 col-md-offset-4" style="color:#CCC"></label>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="clearfix"> </div>
+<div id="dtBox"></div>
+{% end %}
